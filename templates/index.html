@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transliteration</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[url('{{ url_for('static', filename='assets/hero_img.jpg') }}')] text-white bg-no-repeat bg-contain min-h-screen bg-top bg-[#040711] px-6 flex items-center justify-center">
+
+  <div class="flex xl:flex-row xl:max-w-6xl flex-col gap-4 w-full max-w-xl">
+    <div class="bg-[#212936cc]/80 p-5 rounded-xl border border-[#4D5562] w-full">
+      <div class="pb-3 border-b border-[#4D5562] text-[#F9FAFB] font-bold text-[12px] flex gap-2.5" id="from">
+        <button class="py-1.5 px-2.5 rounded-xl bg-[#4D5562] active hover:bg-[#4D5562] duration-200">Chhattisgarhi</button>
+      </div>
+      <textarea class="my-5 bg-transparent resize-none overflow-hidden p-0 w-full min-h-20 text-sm border-none outline-none" id="user_input" maxlength="500" placeholder="Enter Chhattisgarhi text"></textarea>
+      <div class="flex items-end justify-between">
+        <div>
+          <button class="text-sm bg-[#3662E3] border border-[#7CA9F3] py-2 px-4 rounded-lg flex gap-1 items-center" id="translate_btn">
+            <img src="{{ url_for('static', filename='assets/Sort_alfa.svg') }}" class="w-[20px] h-[20px]"> Translate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-[#121826cc] p-5 rounded-xl border border-[#4D5562] w-full">
+      <div class="flex items-center justify-between pb-3 border-b border-[#4D5562]">
+        <div class="text-[#F9FAFB] font-bold text-[12px]">Hindi Output</div>
+      </div>
+      <div class="my-5 w-full min-h-20 text-sm h-auto" id="output"></div>
+    </div>
+  </div>
+
+  <!-- Add JavaScript for interaction -->
+  <script>
+    // Add event listener for the Translate button
+    document.getElementById('translate_btn').addEventListener('click', function () {
+      const input = document.getElementById('user_input').value; // Get user input
+      const output = document.getElementById('output'); // Output container
+      
+      // Clear previous output and show loading message
+      output.textContent = "Translating...";
+
+      // Send POST request to the Flask backend
+      fetch('/transliterate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: input })  // Changed 'word' to 'text'
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Display the transliteration result
+        output.textContent = data.hindi_text;  // Changed 'hindi_word' to 'hindi_text'
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        output.textContent = 'An error occurred. Please try again.';
+      });
+    });
+  </script>
+</body>
+</html>
